@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>To Do Liste</title>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center mt-5">My Vue Todo App</h2><br><br>
+    <div class="d-flex">
+        <input type="text" placeholder="Enter task" v-model="task" min="3" class="form-control">
+        <button class="btn btn-warning rounded-0" id="add" @click="submitTask">Add</button>
+    </div>
+    <br>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col" @click="toggle('name')">Name</th>
+            <th scope="col" @click="toggle('status')">Status</th>
+            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">#</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(task,index) in tasksFilterByName" :key="index" >
+       
+            <td>{{task.name}}</td>
+            <td>{{task.status}}</td>
+            <td>
+                <div class="text-center" @click="deleteTask(index)">
+                    <span class="glyphicon">&#xe020;</span>
+                </div>
+            </td>
+            <td>
+                <div class="text-center" @click="editTask(index)">
+                    <i class="fas fa-edit"></i>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var app = new Vue({
+        el: '.container',
+        data() {
+            return {
+                tasks: [
+                    {
+                        name: 'Nagelstudio Termin',
+                        status: 'to do'
+                    },
+
+                    {
+                        name: 'Yoga machen',
+                        status: 'finished'
+                    },
+                    {
+                        name: 'Einkaufen gehen',
+                        status: 'in progress'
+                    },
+                ],
+                task: '',
+                direction: 'asc', // desc,
+                s: '',
+                editedTask: ''
+
+            };
+        },
+        methods: {
+            submitTask() {
+                if (this.task.length === 0) {
+                    return;
+                }
+                if (this.editedTask === '') {
+                    this.tasks.unshift({
+                        name: this.task,
+                        status: 'to do'
+                    });
+                } else {
+                    this.tasks[this.editedTask].name = this.task;
+                    this.editedTask = '';
+                }
+                this.task = '';
+            },
+            deleteTask(index) {
+                this.tasks.splice(index, 1);
+            },
+            editTask(index) {
+                this.task = this.tasks[index].name;
+                this.editedTask = index;
+            },
+            toggle(column) {
+                this.s = column;
+                if (this.direction === 'desc') {
+                    this.direction = 'asc';
+                } else {
+                    this.direction = 'desc';
+                }
+            }
+        },
+        computed: {
+            tasksSorted() {
+                const tasks = this.tasks.slice();
+
+                tasks.sort((a, b) => {
+                    if (this.direction === 'desc') {
+                        return (a[this.s] < b[this.s]) ? 1 : -1;// if ? then : else
+                    } else {
+                        return (a[this.s] < b[this.s]) ? -1 : 1;
+                    }
+                });
+              return tasks;
+
+            },
+           tasksFilterByName() {
+
+                    let filter = new RegExp(this.task ,'i');
+                    if(this.task.length >2) {
+                        console.log(this.task.length);
+                        return this.tasks.filter(el => el.name.match(filter));
+                    }
+           }
+
+
+        }
+    });
+
+</script>
+</body>
+</html>
